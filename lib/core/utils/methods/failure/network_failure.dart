@@ -1,5 +1,4 @@
 
-
 import 'package:orderly/core/utils/methods/failure/app_failure.dart';
 
 sealed class NetworkAppFailure extends AppFailure {
@@ -21,15 +20,17 @@ final class ServerAppFailure extends NetworkAppFailure {
 }
 
 final class BadRequestFailure extends NetworkAppFailure {
-  const BadRequestFailure() : super('Invalid request. Please check your input.');
+  const BadRequestFailure([String detail = 'Invalid request.']) : super(detail);
 }
 
 final class UnauthorizedFailure extends NetworkAppFailure {
-  const UnauthorizedFailure() : super('Session expired. Please log in again.');
+  const UnauthorizedFailure([String detail = 'Session expired. Please log in again.'])
+      : super(detail);
 }
 
 final class NotFoundFailure extends NetworkAppFailure {
-  const NotFoundFailure() : super('The requested resource was not found.');
+  const NotFoundFailure([String detail = 'The requested resource was not found.'])
+      : super(detail);
 }
 
 final class UnexpectedAppFailure extends NetworkAppFailure {

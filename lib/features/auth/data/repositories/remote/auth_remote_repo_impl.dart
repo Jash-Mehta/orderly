@@ -10,7 +10,7 @@ import 'package:orderly/features/auth/data/repositories/remote/auth_remote_repo.
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 @override
 Future<UserModel> login(LoginRequest request) async {
- final result = await apiClient.post<Map<String, dynamic>>(
+ final result = await apiClient.post(
   ApiEndpoints.auth.login,
   body: request.toJson(),
 );

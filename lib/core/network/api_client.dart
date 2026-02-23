@@ -1,19 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:orderly/core/di/service_locator.dart';
+import 'package:orderly/core/utils/methods/api/api_error_response.dart';
+import 'package:orderly/core/utils/methods/api/api_result.dart';
 import 'package:orderly/core/utils/methods/failure/app_failure.dart';
 import 'package:orderly/core/utils/methods/failure/network_failure.dart';
-import 'package:orderly/core/utils/methods/api/api_result.dart';
 
-/// A thin, type-safe wrapper around [Dio].
-///
-/// Every method returns [Result<T>] so callers never deal with
-/// try/catch or DioException — error mapping is centralised here.
-///
-/// Usage:
-///   final result = await apiClient.get<Map<String, dynamic>>('/users/me');
-///   final result = await apiClient.post<Map<String, dynamic>>(
-///     '/auth/login',
-///     body: request.toJson(),
-///   );
 class ApiClient {
   ApiClient({required Dio dio}) : _dio = dio;
 
@@ -21,13 +12,13 @@ class ApiClient {
 
   // ── GET ────────────────────────────────────────────────────────────────────
 
-  Future<Result<T>> get<T>(
+  Future<Result<Map<String, dynamic>>> get(
     String path, {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
     try {
-      final response = await _dio.get<T>(
+      final response = await _dio.get<Map<String, dynamic>>(
         path,
         queryParameters: queryParameters,
         options: options,
@@ -42,14 +33,14 @@ class ApiClient {
 
   // ── POST ───────────────────────────────────────────────────────────────────
 
-  Future<Result<T>> post<T>(
+  Future<Result<Map<String, dynamic>>> post(
     String path, {
     Object? body,
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
     try {
-      final response = await _dio.post<T>(
+      final response = await _dio.post<Map<String, dynamic>>(
         path,
         data: body,
         queryParameters: queryParameters,
@@ -65,14 +56,14 @@ class ApiClient {
 
   // ── PUT ────────────────────────────────────────────────────────────────────
 
-  Future<Result<T>> put<T>(
+  Future<Result<Map<String, dynamic>>> put(
     String path, {
     Object? body,
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
     try {
-      final response = await _dio.put<T>(
+      final response = await _dio.put<Map<String, dynamic>>(
         path,
         data: body,
         queryParameters: queryParameters,
@@ -88,14 +79,14 @@ class ApiClient {
 
   // ── PATCH ──────────────────────────────────────────────────────────────────
 
-  Future<Result<T>> patch<T>(
+  Future<Result<Map<String, dynamic>>> patch(
     String path, {
     Object? body,
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
     try {
-      final response = await _dio.patch<T>(
+      final response = await _dio.patch<Map<String, dynamic>>(
         path,
         data: body,
         queryParameters: queryParameters,
@@ -111,14 +102,14 @@ class ApiClient {
 
   // ── DELETE ─────────────────────────────────────────────────────────────────
 
-  Future<Result<T>> delete<T>(
+  Future<Result<Map<String, dynamic>>> delete(
     String path, {
     Object? body,
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
     try {
-      final response = await _dio.delete<T>(
+      final response = await _dio.delete<Map<String, dynamic>>(
         path,
         data: body,
         queryParameters: queryParameters,
@@ -132,16 +123,16 @@ class ApiClient {
     }
   }
 
-  // ── Multipart (file upload) ────────────────────────────────────────────────
+  // ── Upload ─────────────────────────────────────────────────────────────────
 
-  Future<Result<T>> upload<T>(
+  Future<Result<Map<String, dynamic>>> upload(
     String path, {
     required FormData formData,
     void Function(int sent, int total)? onSendProgress,
     Options? options,
   }) async {
     try {
-      final response = await _dio.post<T>(
+      final response = await _dio.post<Map<String, dynamic>>(
         path,
         data: formData,
         onSendProgress: onSendProgress,
@@ -157,31 +148,67 @@ class ApiClient {
 
   // ── Private helpers ────────────────────────────────────────────────────────
 
-  Result<T> _handleResponse<T>(Response<T> response) {
+  Result<Map<String, dynamic>> _handleResponse(
+    Response<Map<String, dynamic>> response,
+  ) {
     final data = response.data;
-
-    if (data == null) {
-      // For endpoints that return 204 No Content (e.g. logout, delete).
-      // Callers using Result<void> will receive Success(null).
-      return Success(null as T);
-    }
-
+    if (data == null) return const Success({});
     return Success(data);
   }
 
-  AppFailure _mapDioError(DioException e) => switch (e.type) {
-        DioExceptionType.connectionTimeout ||
-        DioExceptionType.sendTimeout ||
-        DioExceptionType.receiveTimeout =>
-          const TimeoutAppFailure(),
-        DioExceptionType.connectionError => const NoInternetFailure(),
-        DioExceptionType.badResponse => switch (e.response?.statusCode) {
-            400 => const BadRequestFailure(),
-            401 || 403 => const UnauthorizedFailure(),
-            404 => const NotFoundFailure(),
-            500 => const ServerAppFailure(),
-            _ => UnexpectedAppFailure('HTTP ${e.response?.statusCode}'),
-          },
-        _ => const UnexpectedAppFailure(),
+  /// Extracts the server error body from DioException and maps it
+  /// to a typed [AppFailure] using [ApiErrorResponse].
+  AppFailure _mapDioError(DioException e) {
+    // ── Bad response — server returned an error body ───────────────────────
+    if (e.type == DioExceptionType.badResponse) {
+      final errorBody = _parseErrorBody(e);
+      final message = errorBody?.displayMessage;
+      final code = errorBody?.error?.code;
+
+      talker.warning(
+        'Server error | '
+        'status: ${e.response?.statusCode} | '
+        'code: $code | '
+        'message: $message',
+      );
+
+      return switch (e.response?.statusCode) {
+        400 => BadRequestFailure(message ?? 'Invalid request.'),
+        401 => UnauthorizedFailure(message ?? 'Session expired.'),
+        403 => UnauthorizedFailure(message ?? 'Access denied.'),
+        404 => NotFoundFailure(message ?? 'Resource not found.'),
+        500 => ServerAppFailure(message ?? 'Server error.'),
+        _ => UnexpectedAppFailure(message ?? 'Unexpected error.'),
       };
+    }
+
+    // ── Network / timeout errors — no server body ──────────────────────────
+    return switch (e.type) {
+      DioExceptionType.connectionTimeout ||
+      DioExceptionType.sendTimeout ||
+      DioExceptionType.receiveTimeout =>
+        const TimeoutAppFailure(),
+      DioExceptionType.connectionError => const NoInternetFailure(),
+      _ => UnexpectedAppFailure(e.message ?? 'Unexpected error.'),
+    };
+  }
+
+  /// Safely parses the error response body.
+  /// Returns null if the body is missing or malformed.
+  ApiErrorResponse? _parseErrorBody(DioException e) {
+    try {
+      final data = e.response?.data;
+      if (data == null) return null;
+
+      // Dio may return the body as a Map or a String depending on
+      // the response content-type and interceptor configuration.
+      if (data is Map<String, dynamic>) {
+        return ApiErrorResponse.fromJson(data);
+      }
+
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
 }
