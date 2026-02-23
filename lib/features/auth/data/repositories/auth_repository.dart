@@ -1,5 +1,5 @@
-import 'package:orderly/core/utils/methods/api/api_result.dart';
-import 'package:orderly/features/auth/data/models/auth_models.dart';
+import 'package:orderly/core/api/api_result.dart';
+import 'package:orderly/features/auth/data/models/user_models.dart';
 import 'package:orderly/features/auth/data/models/auth_request.dart';
 
 

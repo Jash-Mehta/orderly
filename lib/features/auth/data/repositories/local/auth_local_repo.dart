@@ -1,4 +1,4 @@
-import 'package:orderly/features/auth/data/models/auth_models.dart';
+import 'package:orderly/features/auth/data/models/user_models.dart';
 
 abstract interface class AuthLocalDataSource {
   Future<void> saveToken(String token);

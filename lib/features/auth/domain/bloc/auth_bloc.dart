@@ -2,8 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:orderly/core/di/service_locator.dart';
 import 'package:orderly/core/utils/methods/failure/app_failure.dart';
-import 'package:orderly/core/utils/methods/api/api_result.dart';
-import 'package:orderly/features/auth/data/models/auth_models.dart';
+import 'package:orderly/core/api/api_result.dart';
+import 'package:orderly/features/auth/data/models/user_models.dart';
 import 'package:orderly/features/auth/data/models/auth_request.dart';
 import 'package:orderly/features/auth/domain/bloc/auth_failure.dart';
 
@@ -17,8 +17,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LogoutRequested>(_onLogoutRequested);
     on<AuthCheckRequested>(_onAuthCheckRequested);
   }
-
-  // ── Handlers ───────────────────────────────────────────────────────────────
 
   Future<void> _onLoginRequested(
     LoginRequested event,

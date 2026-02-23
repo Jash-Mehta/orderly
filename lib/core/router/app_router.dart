@@ -3,23 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:orderly/core/di/service_locator.dart';
+import 'package:orderly/core/router/auth_state_notifier.dart';
+import 'package:orderly/core/router/app_routes.dart';
 import 'package:orderly/features/auth/domain/bloc/auth_bloc.dart';
 import 'package:orderly/features/auth/presentation/screens/login_screen.dart';
+import 'package:orderly/features/home/presentation/screen/home_screen.dart';
 
-/// All route paths in one place.
-/// `final class` prevents instantiation and extension.
-final class AppRoutes {
-  AppRoutes._();
-
-  static const login = '/login';
-  static const home = '/home';
-  static const adminRegister = '/admin-register';
-
-  /// Routes accessible without authentication.
-  static const _publicRoutes = {login, adminRegister};
-
-  static bool isPublic(String path) => _publicRoutes.contains(path);
-}
 
 class AppRouter {
   AppRouter._();
@@ -29,7 +18,7 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutes.login,
-    refreshListenable: _AuthStateNotifier(),
+    refreshListenable: AuthStateNotifier(),
 
     // ── Auth guard ──────────────────────────────────────────────────────────
     redirect: (context, state) {
@@ -57,6 +46,14 @@ class AppRouter {
         pageBuilder: (context, state) => MaterialPage(
           key: state.pageKey,
           child: const LoginScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.home,
+        name: 'home',
+        pageBuilder: (context, state) => MaterialPage(
+          key: state.pageKey,
+          child:  HomeScreen(),
         ),
       ),
       // Add protected routes here as your app grows.
@@ -90,18 +87,3 @@ class AppRouter {
   );
 }
 
-/// Bridges [AuthBloc] state changes to GoRouter's [refreshListenable].
-/// GoRouter calls [redirect] every time this notifier fires.
-class _AuthStateNotifier extends ChangeNotifier {
-  _AuthStateNotifier() {
-    _subscription = authBloc.stream.listen((_) => notifyListeners());
-  }
-
-  late final StreamSubscription<AuthState> _subscription;
-
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
-  }
-}

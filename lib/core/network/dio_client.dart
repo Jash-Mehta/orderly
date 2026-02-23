@@ -9,8 +9,6 @@ class DioClient {
   static Dio create() {
     final dio = Dio(
       BaseOptions(
-        // String.fromEnvironment first arg is the VARIABLE NAME, not the URL.
-        // Pass the URL as defaultValue for local dev.
         baseUrl: const String.fromEnvironment(
           'API_BASE_URL',
           defaultValue: 'http://localhost:3000',

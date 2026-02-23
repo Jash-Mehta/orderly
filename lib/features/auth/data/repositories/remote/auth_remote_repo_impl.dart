@@ -1,13 +1,13 @@
 
 import 'package:orderly/constants/api_endpoints.dart';
 import 'package:orderly/core/di/service_locator.dart';
-import 'package:orderly/core/utils/methods/api/api_response.dart';
-import 'package:orderly/core/utils/methods/api/api_result.dart';
-import 'package:orderly/features/auth/data/models/auth_models.dart';
+import 'package:orderly/core/api/api_response.dart';
+import 'package:orderly/core/api/api_result.dart';
+import 'package:orderly/features/auth/data/models/user_models.dart';
 import 'package:orderly/features/auth/data/models/auth_request.dart';
 import 'package:orderly/features/auth/data/repositories/remote/auth_remote_repo.dart';
 
-class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
+class AuthRepoRemoteeImpl implements AuthRepoRemote {
 @override
 Future<UserModel> login(LoginRequest request) async {
  final result = await apiClient.post(

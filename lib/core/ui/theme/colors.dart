@@ -25,6 +25,7 @@ class AppColors {
   static const Color cultured = Color(0xFFF5F6F7);
   static const Color forestGreen = Color(0xFF1B8820);
   static const Color metallicOrange = Color(0xFFDC6803);
+  static const Color warmwhite = Color(0xFFF7F4EF);
   static const Color greyColor = Color.fromARGB(255, 59, 59, 59);
 
   // shade colors

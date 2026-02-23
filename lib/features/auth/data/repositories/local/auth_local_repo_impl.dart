@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:orderly/core/di/service_locator.dart';
-import 'package:orderly/features/auth/data/models/auth_models.dart';
+import 'package:orderly/features/auth/data/models/user_models.dart';
 import 'package:orderly/features/auth/data/repositories/local/auth_local_repo.dart';
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:orderly/core/di/service_locator.dart';
-import 'package:orderly/core/utils/methods/api/api_error_response.dart';
-import 'package:orderly/core/utils/methods/api/api_result.dart';
+import 'package:orderly/core/api/api_error_response.dart';
+import 'package:orderly/core/api/api_result.dart';
 import 'package:orderly/core/utils/methods/failure/app_failure.dart';
 import 'package:orderly/core/utils/methods/failure/network_failure.dart';
 
