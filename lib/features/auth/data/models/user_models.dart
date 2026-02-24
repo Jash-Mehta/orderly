@@ -18,11 +18,12 @@ class UserModel extends Equatable {
   // ── Serialization ──────────────────────────────────────────────────────────
 
   factory UserModel.fromJson(Map<String, dynamic> map) {
+    final user = (map['data'] as Map<String, dynamic>)['user'] as Map<String, dynamic>;
     return UserModel(
-      id: map.getString('id'),
-      email: map.getString('emial'),
-      name: map.getString('name'),
-      token: map.getString('token'),
+      id: user.getString('id'),
+      email: user.getString('emial'),
+      name: user.getString('name'),
+      token: user.getString('token'),
       createdAt: DateTime.tryParse(map.getString('createdAt'))?? DateTime.now(),
     );
   }

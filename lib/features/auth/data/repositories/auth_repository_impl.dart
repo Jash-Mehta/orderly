@@ -22,6 +22,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
     try {
       final response = await authRemoteDataSource.login(request);
+          talker.info('Login response — id: ${response.id}, email: ${response.email}, token: ${response.token}'); 
       await _persistSession(response);
       talker.info('Login successful: ${response.email}');
       return Success(response);
@@ -84,6 +85,7 @@ class AuthRepositoryImpl implements AuthRepository {
     await Future.wait([
       authLocalDataSource.saveToken(response.token),
       authLocalDataSource.saveUser(response),
+      authLocalDataSource.saveUserId(response.id),
     ]);
   }
 

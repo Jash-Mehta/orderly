@@ -1,4 +1,4 @@
-import 'dart:async';
+
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +8,7 @@ import 'package:orderly/core/router/app_routes.dart';
 import 'package:orderly/features/auth/domain/bloc/auth_bloc.dart';
 import 'package:orderly/features/auth/presentation/screens/login_screen.dart';
 import 'package:orderly/features/home/presentation/screen/home_screen.dart';
+import 'package:orderly/features/home/presentation/screen/cart_screen.dart';
 
 
 class AppRouter {
@@ -54,6 +55,14 @@ class AppRouter {
         pageBuilder: (context, state) => MaterialPage(
           key: state.pageKey,
           child:  HomeScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.cart,
+        name: 'cart',
+        pageBuilder: (context, state) => MaterialPage(
+          key: state.pageKey,
+          child: const CartScreen(),
         ),
       ),
       // Add protected routes here as your app grows.

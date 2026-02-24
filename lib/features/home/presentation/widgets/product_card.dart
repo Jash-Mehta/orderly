@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:orderly/features/home/data/model/dashboard_product_model.dart';
+import 'package:orderly/features/home/domain/bloc/home_bloc.dart';
+import 'package:orderly/features/home/data/model/create_order_item.dart';
 
 class ProductCard extends StatefulWidget {
   final DashboardProductModel product;
-  const ProductCard({required this.product});
+  const ProductCard({super.key, required this.product});
 
   @override
   State<ProductCard> createState() => _ProductCardState();
@@ -14,7 +17,6 @@ class _ProductCardState extends State<ProductCard>
 
     with SingleTickerProviderStateMixin {
   late final AnimationController _btnController;
-  late final Animation<double> _btnScale;
   bool _added = false;
 
   @override
@@ -25,8 +27,6 @@ class _ProductCardState extends State<ProductCard>
       duration: const Duration(milliseconds: 200),
       reverseDuration: const Duration(milliseconds: 200),
     );
-    _btnScale = Tween<double>(begin: 1.0, end: 0.9)
-        .animate(CurvedAnimation(parent: _btnController, curve: Curves.easeIn));
   }
 
   @override
@@ -38,7 +38,23 @@ class _ProductCardState extends State<ProductCard>
   Future<void> _handleAdd() async {
     await _btnController.forward();
     await _btnController.reverse();
-    setState(() => _added = true);
+    setState((){
+      _added = true;
+    });
+
+    // Dispatch AddToCart event
+    if (mounted) {
+      context.read<HomeBloc>().add(AddToCart(
+        item: CreateOrderItem(
+          productId: widget.product.productId,
+          quantity: 1,
+          amount: widget.product.price,
+          name: widget.product.name,
+          brandName: widget.product.brandName,
+          image: widget.product.imageUrl,
+        ),
+      ));
+    }
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -66,6 +82,7 @@ class _ProductCardState extends State<ProductCard>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.07),
             blurRadius: 20,
             offset: const Offset(0, 8),

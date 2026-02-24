@@ -6,6 +6,7 @@ final class AppRoutes {
   static const login = '/login';
   static const home = '/home';
   static const adminRegister = '/admin-register';
+  static const cart = '/cart';
 
   /// Routes accessible without authentication.
   static const _publicRoutes = {login, adminRegister};

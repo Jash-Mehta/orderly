@@ -3,6 +3,7 @@ final class ApiEndpoints {
 
   static const auth = _AuthEndpoints();
   static const home = _HomeEndpoints();
+  static const orders = _OrdersEndpoints();
 }
 
 // ── Auth ───────────────────────────────────────────────────────────────────────
@@ -19,4 +20,11 @@ final class _HomeEndpoints {
   const _HomeEndpoints();
   String get home => '/inventory';
 
+}
+
+// ── Orders ───────────────────────────────────────────────────────────────────────
+
+final class _OrdersEndpoints {
+  const _OrdersEndpoints();
+  String get createOrder => '/orders/with-items';
 }

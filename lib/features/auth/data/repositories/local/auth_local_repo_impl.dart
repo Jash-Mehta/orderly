@@ -6,6 +6,7 @@ import 'package:orderly/features/auth/data/repositories/local/auth_local_repo.da
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   static const _tokenKey = 'auth_token';
   static const _userKey = 'user_data';
+  static const _userId = 'user_Id';
 
   // ── Token ──────────────────────────────────────────────────────────────────
 
@@ -28,6 +29,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
       'id': user.id,
       'email': user.email,
       'name': user.name,
+      'token': user.token,
     });
     await secureStorage.write(key: _userKey, value: json);
   }
@@ -58,5 +60,15 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
       deleteToken(),
       deleteUser(),
     ]);
+  }
+  
+  @override
+  Future<void> saveUserId(String userId) {
+    return secureStorage.write(key: _userId, value: userId);
+  }
+
+   @override
+  Future<String ?> getUserId() {
+    return secureStorage.read(key: _userId);
   }
 }

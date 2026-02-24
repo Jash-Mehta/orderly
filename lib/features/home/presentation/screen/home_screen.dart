@@ -5,6 +5,7 @@ import 'package:orderly/features/home/presentation/widgets/header.dart';
 import 'package:orderly/features/home/presentation/widgets/animated_product_card.dart';
 import 'package:orderly/features/home/data/model/dashboard_product_model.dart';
 import 'package:orderly/features/home/domain/bloc/home_bloc.dart';
+import 'package:orderly/features/auth/domain/bloc/auth_bloc.dart';
 
 // ─── Home Screen ────────────────────────────────────────────────────────────
 class HomeScreen extends StatefulWidget {
@@ -24,6 +25,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    // Trigger auth check first
+    context.read<AuthBloc>().add(AuthCheckRequested());
     // Trigger data fetch
     context.read<HomeBloc>().add(GetHomeData());
     
@@ -113,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               return CustomScrollView(
                 physics: const BouncingScrollPhysics(),
                 slivers: [
-                  // ── Header ──────────────────────────────────────────────────────
+                  
                   SliverToBoxAdapter(
                     child: FadeTransition(
                       opacity: _headerFade,
@@ -155,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ),
 
-                  // ── Section label ───────────────────────────────────────────────
+                  
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
                     sliver: SliverToBoxAdapter(
@@ -173,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ),
 
-                  // ── Grid ────────────────────────────────────────────────────────
+                  
                   SliverPadding(
                     padding: const EdgeInsets.all(20),
                     sliver: SliverGrid(

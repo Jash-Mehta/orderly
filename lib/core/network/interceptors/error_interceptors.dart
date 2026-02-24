@@ -1,16 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:orderly/core/di/service_locator.dart';
-
-/// Handles HTTP and network-level errors.
-///
-/// On 401: attempts a token refresh once, retries the original request.
-/// On persistent 401 / refresh failure: clears session and redirects to login.
 class ErrorInterceptor extends QueuedInterceptor {
   ErrorInterceptor(this._dio);
-
   final Dio _dio;
-
-  // Guards against infinite retry loops.
   static const _retryHeader = 'x-retry-after-refresh';
 
   @override

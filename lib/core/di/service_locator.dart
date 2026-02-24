@@ -7,7 +7,6 @@ import 'package:orderly/core/network/dio_client.dart';
 import 'package:orderly/features/auth/data/repositories/auth_repository.dart';
 import 'package:orderly/features/home/data/repositories/home_repo.dart';
 import 'package:orderly/features/home/data/repositories/home_repo_impl.dart';
-import 'package:orderly/features/home/data/repositories/remote/home_remote_repo.dart';
 import 'package:orderly/features/home/data/repositories/remote/home_remote_repo_impl.dart';
 import 'package:orderly/features/home/domain/bloc/home_bloc.dart';
 import 'package:talker_flutter/talker_flutter.dart';
@@ -70,10 +69,8 @@ Future<void> initServices(Talker talker) async {
   getIt.registerLazySingleton<HomeRemoteRepoImpl>(
     () => HomeRemoteRepoImpl(),
   );
-  
 
-
-  // ── Repositories ──────────────────────────────────────────────────────────
+  // ── Repositories ─────────────────────g─────────────────────────────────────
   // Constructor injection — dependencies passed explicitly, not pulled from getIt.
   getIt.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl());
   getIt.registerLazySingleton<HomeRepositories>(() => HomeRepoImpl());
@@ -82,5 +79,5 @@ Future<void> initServices(Talker talker) async {
   // registerFactory creates a new instance each time getIt<AuthBloc>() is called.
   // The BLoC receives its repository via constructor — no internal getIt calls.
   getIt.registerFactory<AuthBloc>(() => AuthBloc());
-  getIt.registerFactory<HomeBloc>(() => HomeBloc());
+getIt.registerLazySingleton(() => HomeBloc());
 }
