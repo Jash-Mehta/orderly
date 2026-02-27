@@ -1,27 +1,26 @@
 
 import 'package:orderly/constants/api_endpoints.dart';
 import 'package:orderly/core/di/service_locator.dart';
-import 'package:orderly/core/utils/methods/api/api_response.dart';
-import 'package:orderly/core/utils/methods/api/api_result.dart';
-import 'package:orderly/features/auth/data/models/auth_models.dart';
+import 'package:orderly/core/api/api_response.dart';
+import 'package:orderly/core/api/api_result.dart';
+import 'package:orderly/features/auth/data/models/user_models.dart';
 import 'package:orderly/features/auth/data/models/auth_request.dart';
 import 'package:orderly/features/auth/data/repositories/remote/auth_remote_repo.dart';
 
-class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
+class AuthRepoRemoteeImpl implements AuthRepoRemote {
 @override
 Future<UserModel> login(LoginRequest request) async {
- final result = await apiClient.post<Map<String, dynamic>>(
-  ApiEndpoints.auth.login,
-  body: request.toJson(),
-);
-
-return switch (result) {
-  Success(:final value) => ApiResponse.fromJson(
-      value,
-      UserModel.fromJson,
-    ).data,
-  Failure(:final failure) => throw failure,
-};
+  final result = await apiClient.post(
+    ApiEndpoints.auth.login,
+    body: request.toJson(),
+  );
+  return switch (result) {
+    Success(:final value) => () {
+        talker.info('Raw login response: $value'); // 👈 add this
+        return UserModel.fromJson(value);
+      }(),
+    Failure(:final failure) => throw failure,
+  };
 }
   @override
   Future<void> logout() async {

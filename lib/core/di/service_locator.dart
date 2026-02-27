@@ -5,6 +5,10 @@ import 'package:get_it/get_it.dart';
 import 'package:orderly/core/network/api_client.dart';
 import 'package:orderly/core/network/dio_client.dart';
 import 'package:orderly/features/auth/data/repositories/auth_repository.dart';
+import 'package:orderly/features/home/data/repositories/home_repo.dart';
+import 'package:orderly/features/home/data/repositories/home_repo_impl.dart';
+import 'package:orderly/features/home/data/repositories/remote/home_remote_repo_impl.dart';
+import 'package:orderly/features/home/domain/bloc/home_bloc.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:orderly/features/auth/data/repositories/local/auth_local_repo.dart';
 import 'package:orderly/features/auth/data/repositories/local/auth_local_repo_impl.dart';
@@ -24,9 +28,12 @@ FlutterSecureStorage get secureStorage => getIt<FlutterSecureStorage>();
 ApiClient get apiClient => getIt<ApiClient>();
 Connectivity get connectivity => getIt<Connectivity>();
 AuthRepository get authRepository => getIt<AuthRepository>();
-AuthRemoteDataSource get authRemoteDataSource => getIt<AuthRemoteDataSource>();
+HomeRepositories get homeRepository => getIt<HomeRepositories>();
+AuthRepoRemote get authRemoteDataSource => getIt<AuthRepoRemote>();
+HomeRemoteRepoImpl get homeRemoteDataSource => getIt<HomeRemoteRepoImpl>();
 AuthLocalDataSource get authLocalDataSource => getIt<AuthLocalDataSource>();
 AuthBloc get authBloc => getIt<AuthBloc>();
+HomeBloc get homeBloc => getIt<HomeBloc>();
 
 // ── Registration ───────────────────────────────────────────────────────────────
 
@@ -44,35 +51,33 @@ Future<void> initServices(Talker talker) async {
   getIt.registerLazySingleton<Connectivity>(() => Connectivity());
 
   // Dio depends on secureStorage (via AuthInterceptor) — register after it.
-  getIt.registerLazySingleton<ApiClient>(
-  () => ApiClient(dio: getIt<Dio>()),
-);
-    getIt.registerLazySingleton<Dio>(() => DioClient.create());
+  getIt.registerLazySingleton<ApiClient>(() => ApiClient(dio: getIt<Dio>()));
+  getIt.registerLazySingleton<Dio>(() => DioClient.create());
 
   // ── Data sources ──────────────────────────────────────────────────────────
   // Registered as LazySingleton — one instance shared only via AuthRepository.
   // Not exposed as global getters; nothing outside the repo layer needs them.
-  getIt.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(),
+  getIt.registerLazySingleton<AuthRepoRemote>(
+    () => AuthRepoRemoteeImpl(),
   );
+
 
   getIt.registerLazySingleton<AuthLocalDataSource>(
     () => AuthLocalDataSourceImpl(),
   );
 
-  // ── Repositories ──────────────────────────────────────────────────────────
-  // Constructor injection — dependencies passed explicitly, not pulled from getIt.
-  getIt.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(
-      
-    ),
+  getIt.registerLazySingleton<HomeRemoteRepoImpl>(
+    () => HomeRemoteRepoImpl(),
   );
+
+  // ── Repositories ─────────────────────g─────────────────────────────────────
+  // Constructor injection — dependencies passed explicitly, not pulled from getIt.
+  getIt.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl());
+  getIt.registerLazySingleton<HomeRepositories>(() => HomeRepoImpl());
 
   // ── BLoCs ─────────────────────────────────────────────────────────────────
   // registerFactory creates a new instance each time getIt<AuthBloc>() is called.
   // The BLoC receives its repository via constructor — no internal getIt calls.
-  getIt.registerFactory<AuthBloc>(
-    () => AuthBloc(
-    ),
-  );
+  getIt.registerFactory<AuthBloc>(() => AuthBloc());
+getIt.registerLazySingleton(() => HomeBloc());
 }

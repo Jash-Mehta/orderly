@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:go_router/go_router.dart';
+import 'package:orderly/core/router/app_routes.dart';
 import 'package:orderly/core/ui/theme/colors.dart';
 import 'package:orderly/core/ui/theme/text_styles.dart';
 import 'package:orderly/core/ui/widgets/app_snackbar.dart';
@@ -50,6 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       case AuthAuthenticated():
         EasyLoading.dismiss();
+        context.go(AppRoutes.home);
         AppSnackbar.success(context, message: "Login Successfully");
 
       case AuthFailureState(:final message):

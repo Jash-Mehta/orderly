@@ -3,8 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:orderly/core/di/service_locator.dart';
 import 'package:orderly/core/utils/methods/failure/app_failure.dart';
 import 'package:orderly/core/utils/methods/failure/network_failure.dart';
-import 'package:orderly/core/utils/methods/api/api_result.dart';
-import 'package:orderly/features/auth/data/models/auth_models.dart';
+import 'package:orderly/core/api/api_result.dart';
+import 'package:orderly/features/auth/data/models/user_models.dart';
 import 'package:orderly/features/auth/data/models/auth_request.dart';
 import 'package:orderly/features/auth/data/repositories/auth_repository.dart';
 import 'package:orderly/features/auth/domain/bloc/auth_failure.dart';
@@ -22,6 +22,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
     try {
       final response = await authRemoteDataSource.login(request);
+          talker.info('Login response — id: ${response.id}, email: ${response.email}, token: ${response.token}'); 
       await _persistSession(response);
       talker.info('Login successful: ${response.email}');
       return Success(response);
@@ -84,6 +85,7 @@ class AuthRepositoryImpl implements AuthRepository {
     await Future.wait([
       authLocalDataSource.saveToken(response.token),
       authLocalDataSource.saveUser(response),
+      authLocalDataSource.saveUserId(response.id),
     ]);
   }
 
