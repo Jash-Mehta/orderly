@@ -21,7 +21,7 @@ class UserModel extends Equatable {
     final user = (map['data'] as Map<String, dynamic>)['user'] as Map<String, dynamic>;
     return UserModel(
       id: user.getString('id'),
-      email: user.getString('emial'),
+      email: user.getString('email'),
       name: user.getString('name'),
       token: user.getString('token'),
       createdAt: DateTime.tryParse(map.getString('createdAt'))?? DateTime.now(),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:orderly/features/auth/domain/bloc/auth_bloc.dart';
 import 'package:orderly/features/home/domain/bloc/home_bloc.dart';
 import 'package:orderly/features/home/presentation/widgets/submit_button.dart';
 
@@ -128,7 +130,17 @@ class OrderSummaryCard extends StatelessWidget {
                 isLoading: isLoading,
                 onPressed: isLoading
                     ? null
-                    : () => context.read<HomeBloc>().add(CreateOrder()),
+                    : () {
+                        // Create order first, then navigate to payment
+                        context.read<HomeBloc>().add(CreateOrder());
+                        
+                        // After order is created, navigate to payment screen
+                        // For now, we'll navigate directly with mock order ID
+                        final authState = context.read<AuthBloc>().state;
+                        if (authState is AuthAuthenticated) {
+                          context.push('/payment?orderId=order_${DateTime.now().millisecondsSinceEpoch}&amount=${cart.totalAmount}');
+                        }
+                      },
               );
             },
           ),

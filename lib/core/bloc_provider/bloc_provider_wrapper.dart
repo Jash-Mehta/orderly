@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:orderly/core/di/service_locator.dart';
 import 'package:orderly/features/auth/domain/bloc/auth_bloc.dart';
 import 'package:orderly/features/home/domain/bloc/home_bloc.dart';
+import 'package:orderly/features/payments/domain/bloc/payment_bloc.dart';
+import 'package:orderly/features/payments/domain/repositories/payment_repository.dart';
+import 'package:orderly/features/payments/data/repositories/payment_repository_impl.dart';
 
 class BlocProviderWrapper extends StatelessWidget {
   const BlocProviderWrapper({Key? key, required this.child}) : super(key: key);
@@ -14,12 +17,16 @@ class BlocProviderWrapper extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) =>
-              getIt<AuthBloc>()..add(const AuthCheckRequested()),
+          create: (context) => getIt<AuthBloc>(),
         ),
          BlocProvider(
           create: (context) =>
               HomeBloc(),
+        ),
+        BlocProvider(
+          create: (context) => PaymentBloc(
+            paymentRepository: PaymentRepositoryImpl(getIt()),
+          ),
         ),
       ],
       child: Builder(

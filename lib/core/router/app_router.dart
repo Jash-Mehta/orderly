@@ -9,6 +9,7 @@ import 'package:orderly/features/auth/domain/bloc/auth_bloc.dart';
 import 'package:orderly/features/auth/presentation/screens/login_screen.dart';
 import 'package:orderly/features/home/presentation/screen/home_screen.dart';
 import 'package:orderly/features/home/presentation/screen/cart_screen.dart';
+import 'package:orderly/features/payments/presentation/screens/payment_screen.dart';
 
 
 class AppRouter {
@@ -60,10 +61,27 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.cart,
         name: 'cart',
+        
         pageBuilder: (context, state) => MaterialPage(
           key: state.pageKey,
           child: const CartScreen(),
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.payment,
+        name: 'payment',
+        pageBuilder: (context, state) {
+          final orderId = state.uri.queryParameters['orderId'] ?? '';
+          final amount = double.tryParse(state.uri.queryParameters['amount'] ?? '0') ?? 0.0;
+          
+          return MaterialPage(
+            key: state.pageKey,
+            child: PaymentScreen(
+              orderId: orderId,
+              amount: amount,
+            ),
+          );
+        },
       ),
       // Add protected routes here as your app grows.
     ],

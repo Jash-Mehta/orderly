@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     // Trigger auth check first
-    context.read<AuthBloc>().add(AuthCheckRequested());
+    context.read<AuthBloc>().add(const AuthCheckRequested());
     // Trigger data fetch
     context.read<HomeBloc>().add(GetHomeData());
     
