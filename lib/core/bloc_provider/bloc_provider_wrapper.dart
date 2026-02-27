@@ -4,7 +4,7 @@ import 'package:orderly/core/di/service_locator.dart';
 import 'package:orderly/features/auth/domain/bloc/auth_bloc.dart';
 import 'package:orderly/features/home/domain/bloc/home_bloc.dart';
 import 'package:orderly/features/payments/domain/bloc/payment_bloc.dart';
-import 'package:orderly/features/payments/domain/repositories/payment_repository.dart';
+import 'package:orderly/features/payments/data/repositories/payment_repository.dart';
 import 'package:orderly/features/payments/data/repositories/payment_repository_impl.dart';
 
 class BlocProviderWrapper extends StatelessWidget {
@@ -25,7 +25,7 @@ class BlocProviderWrapper extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => PaymentBloc(
-            paymentRepository: PaymentRepositoryImpl(getIt()),
+            paymentRepository: PaymentRepositoryImpl(),
           ),
         ),
       ],

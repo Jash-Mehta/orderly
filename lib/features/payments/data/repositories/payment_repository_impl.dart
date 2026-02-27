@@ -1,16 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:orderly/core/api/api_result.dart';
+import 'package:orderly/core/di/service_locator.dart';
 import 'package:orderly/core/network/api_client.dart';
 import 'package:orderly/core/utils/methods/failure/app_failure.dart';
 import 'package:orderly/features/payments/data/models/payment.dart';
 import 'package:orderly/features/payments/data/models/payment_request.dart';
 import 'package:orderly/features/payments/data/models/payment_verification_request.dart';
-import 'package:orderly/features/payments/domain/repositories/payment_repository.dart';
+import 'package:orderly/features/payments/data/repositories/payment_repository.dart';
 
 class PaymentRepositoryImpl implements PaymentRepository {
-  final ApiClient _apiClient;
-
-  PaymentRepositoryImpl(this._apiClient);
+ 
 
   @override
   Future<Payment> createPayment({
@@ -29,8 +28,8 @@ class PaymentRepositoryImpl implements PaymentRepository {
         status: status,
       );
 
-      final result = await _apiClient.post(
-        '/payments',
+      final result = await apiClient.post(
+        '/api/payments',
         body: request.toJson(),
       );
 
@@ -58,8 +57,8 @@ class PaymentRepositoryImpl implements PaymentRepository {
         razorpaySignature: razorpaySignature,
       );
 
-      final result = await _apiClient.post(
-        '/payments/verify',
+      final result = await apiClient.post(
+        '/api/payments/verify',
         body: request.toJson(),
       );
 
@@ -77,7 +76,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
   @override
   Future<Payment?> getPaymentByOrderId(String orderId) async {
     try {
-      final result = await _apiClient.get('/payments/order/$orderId');
+      final result = await apiClient.get('/api/payments/order/$orderId');
 
       switch (result) {
         case Success(:final value):
@@ -93,7 +92,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
   @override
   Future<Payment?> getPaymentByRazorpayId(String razorpayPaymentId) async {
     try {
-      final result = await _apiClient.get('/payments/razorpay/$razorpayPaymentId');
+      final result = await apiClient.get('/api/payments/razorpay/$razorpayPaymentId');
 
       switch (result) {
         case Success(:final value):
@@ -109,7 +108,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
   @override
   Future<List<Payment>> getUserPayments(String userId) async {
     try {
-      final result = await _apiClient.get('/payments/user/$userId');
+      final result = await apiClient.get('/api/payments/user/$userId');
 
       switch (result) {
         case Success(:final value):

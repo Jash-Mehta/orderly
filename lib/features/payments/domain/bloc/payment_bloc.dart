@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:orderly/features/payments/domain/bloc/payment_event.dart';
 import 'package:orderly/features/payments/domain/bloc/payment_state.dart';
-import 'package:orderly/features/payments/domain/repositories/payment_repository.dart';
+import 'package:orderly/features/payments/data/repositories/payment_repository.dart';
 
 class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
   final PaymentRepository _paymentRepository;
@@ -61,13 +61,19 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
         'amount': (event.amount * 100).toInt(), // Amount in paise
         'name': 'Orderly',
         'description': 'Order #${event.orderId}',
-        'order_id': (event.orderId), // Will be set if you create order from backend
         'prefill': {
           'contact': '+919999999999',
           'email': 'customer@example.com',
         },
         'theme': {
           'color': '#1A1A2E',
+        },
+        'modal': {
+          'backdropclose': true,
+          'escape': true,
+          'handleback': true,
+          'confirm_close': true,
+          'animation': 'fade',
         },
       };
 
@@ -81,7 +87,8 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
         amount: event.amount,
       ));
     } catch (e) {
-      emit(PaymentFailure(e.toString()));
+      print('Razorpay error: $e'); // Debug logging
+      emit(PaymentFailure('Payment failed: ${e.toString()}'));
     }
   }
 
@@ -111,6 +118,7 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     // This will be called when Razorpay payment is successful
+    print('Payment success: ${response.paymentId}'); // Debug logging
     // You can emit a success state or handle verification
     add(VerifyPaymentEvent(
       razorpayOrderId: response.orderId?.toString() ?? '',
@@ -121,10 +129,12 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
 
   void _handlePaymentError(PaymentFailureResponse response) {
     // This will be called when Razorpay payment fails
+    print('Payment error: ${response.code} - ${response.message}'); // Debug logging
     add(ResetPaymentStateEvent());
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
     // Handle external wallet selection if needed
+    print('External wallet: ${response.walletName}'); // Debug logging
   }
 }
