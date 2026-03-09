@@ -26,7 +26,15 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   bool _rememberMe = false;
 
+
+
   // ── Lifecycle ──────────────────────────────────────────────────────────────
+
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<AuthBloc>(context).add(const AuthCheckRequested());
+  }
 
   @override
   void dispose() {
@@ -48,11 +56,13 @@ class _LoginScreenState extends State<LoginScreen> {
   void _onAuthStateChanged(BuildContext context, AuthState state) {
     switch (state) {
       case AuthLoading():
-        EasyLoading.show();
+        EasyLoading.dismiss();
+        EasyLoading.show(status: 'Logging in...');
+         break;
 
       case AuthAuthenticated():
         EasyLoading.dismiss();
-        context.go(AppRoutes.home);
+         context.go(AppRoutes.home);
         AppSnackbar.success(context, message: "Login Successfully");
 
       case AuthFailureState(:final message):

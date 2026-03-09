@@ -54,12 +54,12 @@ class CartItemWidget extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             
-            // Product Details
+            
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Brand Name
+                  
                   Text(
                     item.brandName,
                     style: const TextStyle(
@@ -71,7 +71,7 @@ class CartItemWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   
-                  // Product Name
+                  
                   Text(
                     item.name,
                     style: const TextStyle(
@@ -85,10 +85,10 @@ class CartItemWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   
-                  // Quantity and Price Row
+                  
                   Row(
                     children: [
-                      // Quantity Selector
+                      
                       Container(
                         decoration: BoxDecoration(
                           color: const Color(0xFFF5F5F5),
@@ -97,16 +97,11 @@ class CartItemWidget extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            _buildQuantityButton(
-                              icon: Icons.remove,
-                              onTap: () {
-                                // TODO: Implement decrease quantity
-                              },
-                            ),
+                           
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               child: Text(
-                                '${item.quantity}',
+                                'Qty: ${item.quantity}',
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -114,12 +109,7 @@ class CartItemWidget extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            _buildQuantityButton(
-                              icon: Icons.add,
-                              onTap: () {
-                                // TODO: Implement increase quantity
-                              },
-                            ),
+                            
                           ],
                         ),
                       ),
@@ -130,15 +120,7 @@ class CartItemWidget extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text(
-                            '\$${(item.amount / item.quantity).toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF6B7280),
-                              decoration: TextDecoration.lineThrough,
-                              decorationColor: Color(0xFF6B7280),
-                            ),
-                          ),
+                        
                           const SizedBox(height: 2),
                           Text(
                             '\$${item.amount.toStringAsFixed(2)}',
@@ -202,25 +184,5 @@ class CartItemWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildQuantityButton({
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          icon,
-          size: 16,
-          color: AppColors.gunmetal,
-        ),
-      ),
-    );
-  }
+
 }

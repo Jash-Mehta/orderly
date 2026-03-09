@@ -44,9 +44,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     final result = await authRepository.logout();
-
-    // Always navigate to unauthenticated regardless of remote failure.
-    // A cache failure is logged but the user is still logged out locally.
     switch (result) {
       case Success():
         emit(const AuthUnauthenticated());
@@ -63,7 +60,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(const AuthLoading());
 
-    // Step 1 — check if a token exists locally
+    
     final loggedInResult = await authRepository.isLoggedIn();
 
     switch (loggedInResult) {
@@ -74,15 +71,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(const AuthUnauthenticated());
         return;
       case Success():
-        break; // token exists — proceed to restore user
+        break;
     }
-
-    // Step 2 — restore the user object from local storage
     final userResult = await authRepository.getCurrentUser();
 
     switch (userResult) {
       case Success(:final value) when value != null:
-        emit(AuthAuthenticated(user: value));
+
+       emit(AuthAuthenticated(user: value));
         talker.info('Session restored: ${value.email}');
       case Success():
         // Token existed but user data was missing — session is corrupt

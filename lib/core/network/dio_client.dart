@@ -11,7 +11,7 @@ class DioClient {
       BaseOptions(
         baseUrl: const String.fromEnvironment(
           'API_BASE_URL',
-          defaultValue: 'http://localhost:3000',
+          defaultValue: 'https://troubleproof-carla-nonlethal.ngrok-free.dev',
         ),
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
