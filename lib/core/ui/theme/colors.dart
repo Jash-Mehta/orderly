@@ -44,6 +44,17 @@ class AppColors {
   static const Color textSecondary = auroMetalSaurus;
 
   // Add to your existing AppColors class
+    static const bg      = Color(0xFF0D1117);
+  static const surface = Color(0xFF161B22);
+  static const border  = Color(0x12FFFFFF);
+  static const text    = Color(0xFFE6EDF3);
+  static const muted   = Color(0xFF7D8590);
+  static const amber   = Color(0xFFF0A500);
+   static const green    = Color(0xFF3FB950);
+ static const red      = Color(0xFFF85149);
+  static const surface2 = Color(0xFF1C2330);
+  static const blue    = Color(0xFF58A6FF);
+  static const purple    = Colors.purple;
 
 // ── Snackbar surface colors (light tinted backgrounds) ─────────────────────
 static const Color successSurface = Color(0xFFECFDF5);

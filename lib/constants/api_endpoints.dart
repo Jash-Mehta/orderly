@@ -4,6 +4,7 @@ final class ApiEndpoints {
   static const auth = _AuthEndpoints();
   static const home = _HomeEndpoints();
   static const orders = _OrdersEndpoints();
+  static const shipments = _ShipmentsEndpoints();
 }
 
 // ── Auth ───────────────────────────────────────────────────────────────────────
@@ -27,4 +28,11 @@ final class _HomeEndpoints {
 final class _OrdersEndpoints {
   const _OrdersEndpoints();
   String get createOrder => '/orders/with-items';
+}
+
+// ── Shipments ─────────────────────────────────────────────────────────────────────
+
+final class _ShipmentsEndpoints {
+  const _ShipmentsEndpoints();
+  String tracking(String shipmentId) => '/api/shipment/$shipmentId/tracking';
 }

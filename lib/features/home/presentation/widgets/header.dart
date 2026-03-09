@@ -24,7 +24,7 @@ class Header extends StatelessWidget {
                     fontWeight: FontWeight.w900,
                     letterSpacing: -1.5,
                     height: 1,
-                    color: AppColors.gunmetal,
+                    color: AppColors.white,
                   ),
                 ),
                 SizedBox(height: 4),
@@ -32,7 +32,7 @@ class Header extends StatelessWidget {
                   'Curated for you',
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.darkElectricBlue,
+                    color: AppColors.white,
                     letterSpacing: 0.5,
                     fontStyle: FontStyle.italic,
                   ),
@@ -40,7 +40,7 @@ class Header extends StatelessWidget {
               ],
             ),
           ),
-          // Cart icon
+          
           GestureDetector(
             onTap: () {
               context.push(AppRoutes.cart);
@@ -49,7 +49,7 @@ class Header extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color:  AppColors.chineseBlue,
+                color:  AppColors.bg,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Stack(
@@ -58,7 +58,7 @@ class Header extends StatelessWidget {
                     child: const Icon(Icons.shopping_bag_outlined,
                         color: Colors.white, size: 20),
                   ),
-                  // Cart item count badge
+                  
                   BlocBuilder<HomeBloc, HomeState>(
                     builder: (context, state) {
                       if (state is HomeLoadedState && 

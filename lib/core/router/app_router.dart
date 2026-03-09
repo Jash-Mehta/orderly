@@ -10,6 +10,8 @@ import 'package:orderly/features/auth/presentation/screens/login_screen.dart';
 import 'package:orderly/features/home/presentation/screen/home_screen.dart';
 import 'package:orderly/features/home/presentation/screen/cart_screen.dart';
 import 'package:orderly/features/payments/presentation/screens/payment_screen.dart';
+import 'package:orderly/features/shipments/presentation/screens/shipment_tracking_screen.dart';
+
 
 
 class AppRouter {
@@ -79,6 +81,20 @@ class AppRouter {
             child: PaymentScreen(
               orderId: orderId,
               amount: amount,
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.shipmentTracking,
+        name: 'shipment-tracking',
+        pageBuilder: (context, state) {
+          final args = state.extra as ShipmentTrackingArgs?;
+          
+          return MaterialPage(
+            key: state.pageKey,
+            child: ShipmentTrackingScreen(
+              shipmentId: args?.shipmentId ?? '',
             ),
           );
         },
