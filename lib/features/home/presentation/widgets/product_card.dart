@@ -1,23 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:orderly/core/ui/theme/colors.dart';
 import 'package:orderly/features/home/data/model/dashboard_product_model.dart';
 import 'package:orderly/features/home/domain/bloc/home_bloc.dart';
 import 'package:orderly/features/home/data/model/create_order_item.dart';
 
 class ProductCard extends StatefulWidget {
   final DashboardProductModel product;
-  const ProductCard({super.key, required this.product});
+  final int? index;
+  final bool enableAnimation;
+  final bool enableEntranceAnimation;
+  final Duration entranceDelay;
+
+  const ProductCard({
+    super.key, 
+    required this.product,
+    this.index,
+    this.enableAnimation = true,
+    this.enableEntranceAnimation = false,
+    this.entranceDelay = Duration.zero,
+  });
 
   @override
   State<ProductCard> createState() => _ProductCardState();
 }
 
 class _ProductCardState extends State<ProductCard>
-
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _btnController;
+  late final AnimationController? _entranceController;
+  late final Animation<double>? _fade;
+  late final Animation<Offset>? _slide;
   bool _added = false;
+  bool _pressed = false;
 
   @override
   void initState() {
@@ -27,22 +42,40 @@ class _ProductCardState extends State<ProductCard>
       duration: const Duration(milliseconds: 200),
       reverseDuration: const Duration(milliseconds: 200),
     );
+
+    if (widget.enableEntranceAnimation) {
+      _entranceController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 500),
+      );
+      _fade = CurvedAnimation(parent: _entranceController!, curve: Curves.easeOut);
+      _slide = Tween<Offset>(
+        begin: const Offset(0, 0.15),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(parent: _entranceController!, curve: Curves.easeOut));
+
+      Future.delayed(widget.entranceDelay, () {
+        if (mounted) _entranceController.forward();
+      });
+    }
   }
 
   @override
   void dispose() {
     _btnController.dispose();
+    _entranceController?.dispose();
     super.dispose();
   }
+
+  void _onTapDown(_) => setState(() => _pressed = true);
+  void _onTapUp(_) => setState(() => _pressed = false);
+  void _onTapCancel() => setState(() => _pressed = false);
 
   Future<void> _handleAdd() async {
     await _btnController.forward();
     await _btnController.reverse();
-    setState((){
-      _added = true;
-    });
+    setState(() => _added = true);
 
-    // Dispatch AddToCart event
     if (mounted) {
       context.read<HomeBloc>().add(AddToCart(
         item: CreateOrderItem(
@@ -62,7 +95,7 @@ class _ProductCardState extends State<ProductCard>
           content: Text('${widget.product.name} added ✓'),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          backgroundColor: const Color(0xFF1A1A2E),
+          backgroundColor: AppColors.surface,
           duration: const Duration(seconds: 2),
         ),
       );
@@ -75,137 +108,124 @@ class _ProductCardState extends State<ProductCard>
   @override
   Widget build(BuildContext context) {
     final p = widget.product;
+    final inStock = p.availableQuantity > 0;
 
-    return Container(
+    final cardContent = Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            // ignore: deprecated_member_use
-            color: Colors.black.withOpacity(0.07),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border, width: 1),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Image area ────────────────────────────────────────────────────
+          
           Expanded(
             flex: 5,
             child: Stack(
               fit: StackFit.expand,
               children: [
+                // Product image
                 Image.network(
                   p.imageUrl,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: const Color(0xFFEEEBE4),
-                    child: Center(
-                      child: Text('📦',
-                          style: const TextStyle(fontSize: 48)),
-                    ),
-                  ),
+                  errorBuilder: (_, __, ___) => _buildImgPlaceholder(),
                   loadingBuilder: (_, child, progress) {
                     if (progress == null) return child;
-                    return Container(
-                      color: const Color(0xFFEEEBE4),
-                      child: Center(
-                        child: Text('📦',
-                            style: const TextStyle(fontSize: 32)),
-                      ),
-                    );
+                    return _buildImgPlaceholder();
                   },
                 ),
-                // Subtle gradient overlay at bottom of image
+
+                // Bottom scrim
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Container(
-                    height: 40,
+                    height: 48,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                         colors: [
-                          Colors.white.withOpacity(0.6),
+                          AppColors.surface.withOpacity(0.85),
                           Colors.transparent,
                         ],
                       ),
                     ),
                   ),
                 ),
-                // Cart icon at top right
+
+                // Top-right badges
                 Positioned(
                   top: 8,
                   right: 8,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Out of stock indicator
-                      if (p.availableQuantity <= 0)
+                      // Out of stock badge
+                      if (!inStock) ...[
                         Container(
-                          padding: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 7, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFDC2626),
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+                            color: AppColors.red.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(
-                            Icons.priority_high,
-                            color: Colors.white,
-                            size: 12,
+                          child: const Text(
+                            'OUT',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ),
-                      if (p.availableQuantity <= 0) const SizedBox(width: 4),
-                      // Cart icon
+                        const SizedBox(width: 4),
+                      ],
+
+                      // Add to cart button
                       GestureDetector(
-                        onTap: p.availableQuantity > 0 ? _handleAdd : null,
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
+                        onTap: inStock ? _handleAdd : null,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 32,
+                          height: 32,
                           decoration: BoxDecoration(
                             color: _added
-                                ? const Color(0xFF2ECC71)
-                                : p.availableQuantity > 0
-                                    ? Colors.white
-                                    : const Color(0xFFE5E7EB),
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+                                ? AppColors.green
+                                : inStock
+                                    ? Colors.white.withOpacity(0.12)
+                                    : AppColors.border,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: _added
+                                  ? AppColors.green
+                                  : Colors.white.withOpacity(0.15),
+                              width: 1,
+                            ),
                           ),
                           child: Icon(
-                            _added ? Icons.check : Icons.shopping_cart_outlined,
+                            _added
+                                ? Icons.check_rounded
+                                : Icons.add_shopping_cart_rounded,
                             color: _added
-                                ? Colors.white
-                                : p.availableQuantity > 0
-                                    ? const Color(0xFF1A1A2E)
-                                    : const Color(0xFF6B7280),
-                            size: 16,
+                                ? Colors.black
+                                : inStock
+                                    ? Colors.white
+                                    : AppColors.muted,
+                            size: 15,
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-            
               ],
             ),
           ),
 
-          // ── Info area ──────────────────────────────────────────────────
+          // ── Info area ──
           Expanded(
             flex: 4,
             child: Padding(
@@ -218,13 +238,14 @@ class _ProductCardState extends State<ProductCard>
                   Text(
                     p.brandName,
                     style: const TextStyle(
-                      fontSize: 11,
+                      fontSize: 10,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF6B7280),
-                      height: 1.2,
+                      color: AppColors.muted,
+                      letterSpacing: 0.5,
                     ),
                   ),
                   const SizedBox(height: 2),
+
                   // Name
                   Text(
                     p.name,
@@ -233,56 +254,46 @@ class _ProductCardState extends State<ProductCard>
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1A1A2E),
+                      color: AppColors.text,
                       height: 1.3,
+                      letterSpacing: -0.2,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  // Rating (simulated)
+                  const SizedBox(height: 6),
+
+                  // Rating
                   Row(
                     children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.star,
-                            color: Color(0xFFFFB800),
-                            size: 12,
-                          ),
-                          const SizedBox(width: 2),
-                          Text(
-                            '4.5', // Simulated rating
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF1A1A2E),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        '(234)', // Simulated reviews
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: Color(0xFF6B7280),
+                      const Icon(Icons.star_rounded,
+                          color: Color(0xFFFFB800), size: 13),
+                      const SizedBox(width: 3),
+                      const Text(
+                        '4.5',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.text,
                         ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Text(
+                        '(234)',
+                        style: TextStyle(fontSize: 10, color: AppColors.muted),
                       ),
                     ],
                   ),
                   const SizedBox(height: 6),
-                  // Price section
-                  Text(
-                        '\$${p.price.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF1A1A2E),
-                          letterSpacing: -0.5,
-                        ),
-                      ),
 
-                 
+                  // Price
+                  Text(
+                    '\$${p.price.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.amber,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -290,6 +301,40 @@ class _ProductCardState extends State<ProductCard>
         ],
       ),
     );
+
+    final animatedCard = widget.enableAnimation
+        ? GestureDetector(
+            onTapDown: _onTapDown,
+            onTapUp: _onTapUp,
+            onTapCancel: _onTapCancel,
+            child: AnimatedScale(
+              scale: _pressed ? 0.96 : 1.0,
+              duration: const Duration(milliseconds: 120),
+              curve: Curves.easeInOut,
+              child: cardContent,
+            ),
+          )
+        : cardContent;
+
+    if (widget.enableEntranceAnimation && _fade != null && _slide != null) {
+      return FadeTransition(
+        opacity: _fade!,
+        child: SlideTransition(
+          position: _slide!,
+          child: animatedCard,
+        ),
+      );
+    }
+
+    return animatedCard;
+  }
+
+  Widget _buildImgPlaceholder() {
+    return Container(
+      color: AppColors.surface2,
+      child: const Center(
+        child: Text('📦', style: TextStyle(fontSize: 36)),
+      ),
+    );
   }
 }
-

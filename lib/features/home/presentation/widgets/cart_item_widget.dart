@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:orderly/core/ui/theme/colors.dart';
 import 'package:orderly/features/home/data/model/create_order_item.dart';
 
+
+
+
 class CartItemWidget extends StatelessWidget {
   final CreateOrderItem item;
   final VoidCallback onRemove;
@@ -15,29 +18,23 @@ class CartItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border, width: 1),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         child: Row(
           children: [
-            // Product Image
+            
             Container(
-              width: 80,
-              height: 80,
+              width: 76,
+              height: 76,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                color: const Color(0xFFF8F9FA),
+                color: const Color(0xFF1C2330),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.border, width: 1),
               ),
               clipBehavior: Clip.antiAlias,
               child: item.image.isNotEmpty
@@ -52,109 +49,97 @@ class CartItemWidget extends StatelessWidget {
                     )
                   : _buildPlaceholder(),
             ),
-            const SizedBox(width: 16),
-            
+            const SizedBox(width: 14),
+
             
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  
+                  // Brand
                   Text(
                     item.brandName,
                     style: const TextStyle(
-                      fontSize: 11,
+                      fontSize: 10,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF6B7280),
-                      letterSpacing: 0.5,
+                      color: AppColors.muted,
+                      letterSpacing: 0.8,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  
+                  const SizedBox(height: 3),
+
                   
                   Text(
                     item.name,
                     style: const TextStyle(
-                      fontSize: 15,
+                      fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.gunmetal,
+                      color: AppColors.text,
                       letterSpacing: -0.3,
+                      height: 1.3,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 12),
-                  
+
                   
                   Row(
                     children: [
                       
                       Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF5F5F5),
-                          borderRadius: BorderRadius.circular(12),
+                          color: const Color(0xFF1C2330),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppColors.border, width: 1),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                           
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              child: Text(
-                                'Qty: ${item.quantity}',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.gunmetal,
-                                ),
-                              ),
-                            ),
-                            
-                          ],
+                        child: Text(
+                          'Qty: ${item.quantity}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.muted,
+                          ),
                         ),
                       ),
-                      
+
                       const Spacer(),
+
                       
-                      // Price
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                        
-                          const SizedBox(height: 2),
-                          Text(
-                            '\$${item.amount.toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.gunmetal,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        '\$${item.amount.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.amber,
+                          letterSpacing: -0.5,
+                        ),
                       ),
                     ],
                   ),
                 ],
               ),
             ),
+
+            const SizedBox(width: 10),
+
             
-            const SizedBox(width: 12),
-            
-            // Remove Button
             GestureDetector(
               onTap: onRemove,
               child: Container(
-                width: 36,
-                height: 36,
+                width: 34,
+                height: 34,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF5F5),
+                  color: AppColors.red.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.red.withOpacity(0.2), width: 1),
                 ),
                 child: const Icon(
-                  Icons.delete_outline,
-                  color: Color(0xFFDC2626),
-                  size: 18,
+                  Icons.delete_outline_rounded,
+                  color: AppColors.red,
+                  size: 17,
                 ),
               ),
             ),
@@ -166,23 +151,12 @@ class CartItemWidget extends StatelessWidget {
 
   Widget _buildPlaceholder() {
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFFF8F9FA),
-            const Color(0xFFE5E7EB),
-          ],
-        ),
-      ),
+      color: const Color(0xFF1C2330),
       child: const Icon(
         Icons.image_outlined,
-        size: 32,
-        color: Color(0xFF9CA3AF),
+        size: 28,
+        color: AppColors.muted,
       ),
     );
   }
-
-
 }

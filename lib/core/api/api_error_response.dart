@@ -21,9 +21,6 @@ class ApiErrorResponse {
           : null,
     );
   }
-
-  /// Human-readable message — prefers `error.details` over top-level `message`
-  /// since details is more specific.
   String get displayMessage => error?.details ?? message;
 
   @override

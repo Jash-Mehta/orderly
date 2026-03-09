@@ -16,6 +16,9 @@ import 'package:orderly/features/auth/data/repositories/remote/auth_remote_repo.
 import 'package:orderly/features/auth/data/repositories/remote/auth_remote_repo_impl.dart';
 import 'package:orderly/features/auth/domain/bloc/auth_bloc.dart';
 import 'package:orderly/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:orderly/features/shipments/data/repositories/shipment_repository.dart';
+import 'package:orderly/features/shipments/data/repositories/shipment_repository_impl.dart';
+import 'package:orderly/features/shipments/domain/bloc/shipment_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -34,6 +37,8 @@ HomeRemoteRepoImpl get homeRemoteDataSource => getIt<HomeRemoteRepoImpl>();
 AuthLocalDataSource get authLocalDataSource => getIt<AuthLocalDataSource>();
 AuthBloc get authBloc => getIt<AuthBloc>();
 HomeBloc get homeBloc => getIt<HomeBloc>();
+ShipmentRepository get shipmentRepository => getIt<ShipmentRepository>();
+ShipmentBloc get shipmentBloc => getIt<ShipmentBloc>();
 
 // ── Registration ───────────────────────────────────────────────────────────────
 
@@ -74,10 +79,12 @@ Future<void> initServices(Talker talker) async {
   // Constructor injection — dependencies passed explicitly, not pulled from getIt.
   getIt.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl());
   getIt.registerLazySingleton<HomeRepositories>(() => HomeRepoImpl());
+  getIt.registerLazySingleton<ShipmentRepository>(() => ShipmentRepositoryImpl());
 
   // ── BLoCs ─────────────────────────────────────────────────────────────────
   // registerFactory creates a new instance each time getIt<AuthBloc>() is called.
   // The BLoC receives its repository via constructor — no internal getIt calls.
   getIt.registerFactory<AuthBloc>(() => AuthBloc());
-getIt.registerLazySingleton(() => HomeBloc());
+  getIt.registerLazySingleton(() => HomeBloc());
+  getIt.registerFactory<ShipmentBloc>(() => ShipmentBloc(getIt<ShipmentRepository>()));
 }

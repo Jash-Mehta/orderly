@@ -24,7 +24,7 @@ class CartHeader extends StatelessWidget {
                     fontWeight: FontWeight.w900,
                     letterSpacing: -1.5,
                     height: 1,
-                    color: Color(0xFF1A1A2E),
+                    color: Colors.white
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -34,7 +34,7 @@ class CartHeader extends StatelessWidget {
                       : '$itemCount ${itemCount == 1 ? 'item' : 'items'} in your bag',
                   style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.black45,
+                    color: Colors.white,
                     letterSpacing: 0.5,
                     fontStyle: FontStyle.italic,
                   ),
@@ -42,14 +42,14 @@ class CartHeader extends StatelessWidget {
               ],
             ),
           ),
-          // Back button with enhanced styling
+          
           GestureDetector(
             onTap: () => context.pop(),
             child: Container(
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: AppColors.chineseBlue,
+                color: AppColors.bg,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(

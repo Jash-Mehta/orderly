@@ -1,5 +1,7 @@
 
 
+// ignore_for_file: unintended_html_in_doc_comment
+
 import 'package:orderly/core/utils/methods/failure/app_failure.dart';
 
 /// A generic Result type for the entire app.

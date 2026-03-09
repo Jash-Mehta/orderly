@@ -8,6 +8,7 @@ final class AppRoutes {
   static const adminRegister = '/admin-register';
   static const cart = '/cart';
   static const payment = '/payment';
+  static const shipmentTracking = '/shipment-tracking';
 
   /// Routes accessible without authentication.
   static const _publicRoutes = {login, adminRegister};
